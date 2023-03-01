@@ -23,21 +23,18 @@ class SpeachToText:
             raise ValueError(f"Could not find audio device named {device_name}")
 
         # open the audio stream
-        self.CHUNK = 512
-        FORMAT = pyaudio.paInt16
-        CHANNELS = 1
-        RATE = 16000
+        self.chunk_size = 512
 
         print()
         # print ready in green
         print("\033[92m{}\033[00m".format("ready!"))
 
-        self.stream = self.p.open(format=FORMAT,
-                                  channels=CHANNELS,
-                                  rate=RATE,
+        self.stream = self.p.open(format=pyaudio.paInt16,
+                                  channels=1,
+                                  rate=16000,
                                   input_device_index=device_index,
                                   input=True,
-                                  frames_per_buffer=self.CHUNK)
+                                  frames_per_buffer=self.chunk_size)
 
         # setup whisper
         self.model = whisper.load_model(model_name)
