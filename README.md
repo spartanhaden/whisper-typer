@@ -1,6 +1,6 @@
 # whisper-typer
 
-A small script that will type what you say using whisper.
+A small script that types what you say using whisper while holding a hotkey
 
 ## Usage
 
