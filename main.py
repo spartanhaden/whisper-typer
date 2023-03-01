@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
 
-import pickle
-import pprint
-import time
-import wave
-
 import numpy as np
 import pyaudio
 import whisper
@@ -68,9 +63,6 @@ class SpeachToText:
 
         whisper_output = self.model.transcribe(data_to_transcribe, language="en")
 
-        import pprint
-
-        # pprint.pprint(result)
         # set the output text and remove the leading space
         output_text = whisper_output["text"][1:]
         print(output_text)
