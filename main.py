@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import threading
 import time
 
@@ -157,7 +158,17 @@ class SpeachToText:
 
 
 if __name__ == '__main__':
+    # get the args
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--model_name', type=str, default='medium.en', choices=['tiny.en', 'tiny', 'base.en', 'base', 'small.en',
+                        'small', 'medium.en', 'medium', 'large-v1', 'large-v2', 'large'], help='the name of the model to use')
+    args = parser.parse_args()
+
+    # print model name
+    print(f'model: {args.model_name}')
+
+    # run the program
     try:
-        SpeachToText().run()
+        SpeachToText(model_name=args.model_name).run()
     except KeyboardInterrupt:
         print("Exiting...")
