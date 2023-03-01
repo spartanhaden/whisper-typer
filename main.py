@@ -7,7 +7,7 @@ from pynput import keyboard
 
 
 class SpeachToText:
-    def __init__(self, device_name) -> None:
+    def __init__(self, device_name='default', model_name='base.en') -> None:
         self.p = pyaudio.PyAudio()
         self.stream = None
 
@@ -40,7 +40,7 @@ class SpeachToText:
                                   frames_per_buffer=self.CHUNK)
 
         # setup whisper
-        self.model = whisper.load_model("base.en")
+        self.model = whisper.load_model(model_name)
 
         self.keyboard = keyboard.Controller()
 
@@ -61,7 +61,7 @@ class SpeachToText:
 
         data_to_transcribe = data.copy().flatten().astype(np.float32) / 32768.0
 
-        whisper_output = self.model.transcribe(data_to_transcribe, language="en")
+        whisper_output = self.model.transcribe(data_to_transcribe)
 
         # set the output text and remove the leading space
         output_text = whisper_output["text"][1:]
@@ -109,5 +109,4 @@ class SpeachToText:
 
 
 if __name__ == '__main__':
-    speech_to_text = SpeachToText('default')
-    speech_to_text.run()
+    SpeachToText().run()
