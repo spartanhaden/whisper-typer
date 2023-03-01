@@ -44,8 +44,6 @@ class SpeachToText:
         # print ready in green
         print("\033[92m{}\033[00m".format("ready!"))
 
-        self.current_keys = set()
-
         # F16 key
         self.activation_key = keyboard.KeyCode.from_vk(269025095)
         self.activation_key_pressed = False
@@ -118,9 +116,7 @@ class SpeachToText:
 
     # called when a key is pressed
     def on_press(self, key):
-        self.current_keys.add(key)
-
-        # check if the right key was pressed and that another copy of the key is not already pressed
+        # check if the designated key was pressed and that the key is not already being pressed
         if key == self.activation_key and not self.activation_key_pressed:
             # check if the thread is already running
             if self.listener_thread is not None and self.listener_thread.is_alive():
@@ -133,8 +129,7 @@ class SpeachToText:
 
     # called when a key is released
     def on_release(self, key):
-        self.current_keys.discard(key)
-
+        # check if the designated key was released
         if key == self.activation_key:
             self.activation_key_pressed = False
 
