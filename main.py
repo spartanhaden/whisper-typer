@@ -116,19 +116,6 @@ class SpeachToText:
                 print("Exiting...")
 
 
-def graph_frames_from_pyaudio(frames):
-    import matplotlib.pyplot as plt
-    import numpy as np
-
-    # get the audio data from the frames
-    data = b''.join(frames)
-    data = np.frombuffer(data, dtype=np.int16)
-
-    # plot the audio data
-    plt.plot(data)
-    plt.show()
-
-
 if __name__ == '__main__':
     speech_to_text = SpeachToText('default')
     speech_to_text.run()
