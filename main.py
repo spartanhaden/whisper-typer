@@ -76,11 +76,8 @@ class SpeachToText:
 
         whisper_output = self.model.transcribe(data_to_transcribe)
 
-        # set the output text and remove the leading space
-        output_text = whisper_output["text"][1:]
-        print(output_text)
-
-        return output_text
+        # return just the text
+        return whisper_output["text"]
 
     # listens to the audio stream and then processes the frames and types the output text
     def listen(self):
@@ -105,11 +102,28 @@ class SpeachToText:
         # process the frames
         output_text = self.infer(self.frames)
 
-        # type the output text
-        self.keyboard.type(output_text)
-
         # reset the frames
         self.frames = []
+
+        # check if the output text is empty
+        if output_text == '':
+            print('nothing detected')
+            self.activation_key_pressed = False
+            return
+
+        # remove the leading space
+        output_text = output_text[1:]
+
+        # remove the trailing period if there is one
+        output_text = output_text[:-1] if output_text[-1] == '.' else output_text
+
+        # convert the text to lowercase
+        output_text = output_text.lower()
+
+        print(output_text)
+
+        # type the output text
+        self.keyboard.type(output_text)
 
         # reset the activation key
         self.activation_key_pressed = False
