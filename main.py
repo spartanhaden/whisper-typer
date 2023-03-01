@@ -155,5 +155,5 @@ def unpickle_frames():
 
 
 if __name__ == '__main__':
-    speech_to_text = SpeachToText('')
+    speech_to_text = SpeachToText('default')
     speech_to_text.run()
