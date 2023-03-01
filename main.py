@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+import threading
+import time
+
 import numpy as np
 import pyaudio
 import whisper
@@ -35,14 +38,29 @@ class SpeachToText:
         # setup whisper
         self.model = whisper.load_model(model_name)
 
+        # setup pynput
         self.keyboard = keyboard.Controller()
 
-        print()
         # print ready in green
         print("\033[92m{}\033[00m".format("ready!"))
 
+        self.current_keys = set()
+
+        # F16 key
+        self.activation_key = keyboard.KeyCode.from_vk(269025095)
+        self.activation_key_pressed = False
+        self.listener_thread = None
+
+        # list of the frames the audio stream has read
+        self.frames = []
+
     # make destructor to close the stream and terminate the pyaudio instance
     def __del__(self):
+        # check ifthe thread is still running
+        if self.listener_thread is not None and self.listener_thread.is_alive():
+            print('thread still running')
+            print(f'thread: {self.listener_thread}')
+
         # if there is a stream open close it
         if self.stream is not None:
             self.stream.stop_stream()
@@ -50,7 +68,7 @@ class SpeachToText:
         if self.p is not None:
             self.p.terminate()
 
-    # note that
+    # runs the model on the frames
     def infer(self, frames):
         # a np array containing the audio waveform
         data = b''.join(frames)
@@ -64,46 +82,73 @@ class SpeachToText:
         output_text = whisper_output["text"][1:]
         print(output_text)
 
-        self.keyboard.type(output_text)
-
         return output_text
 
+    # listens to the audio stream and then processes the frames and types the output text
+    def listen(self):
+        self.activation_key_pressed = True
+
+        # print listening in cyan
+        print()
+        print("\033[96m{}\033[00m".format("listening..."))
+        self.stream.start_stream()
+
+        while self.activation_key_pressed:
+            frames_to_read = self.stream.get_read_available()
+            if frames_to_read > 0:
+                data = self.stream.read(frames_to_read, exception_on_overflow=False)
+                self.frames.append(data)
+
+            time.sleep(0.001)
+
+        # stop the stream
+        self.stream.stop_stream()
+
+        # process the frames
+        output_text = self.infer(self.frames)
+
+        # type the output text
+        self.keyboard.type(output_text)
+
+        # reset the frames
+        self.frames = []
+
+        # reset the activation key
+        self.activation_key_pressed = False
+
+    # called when a key is pressed
+    def on_press(self, key):
+        self.current_keys.add(key)
+
+        # check if the right key was pressed and that another copy of the key is not already pressed
+        if key == self.activation_key and not self.activation_key_pressed:
+            # check if the thread is already running
+            if self.listener_thread is not None and self.listener_thread.is_alive():
+                print('thread already running')
+                return
+
+            # start a new thread of the listen function
+            self.listener_thread = threading.Thread(target=self.listen)
+            self.listener_thread.start()
+
+    # called when a key is released
+    def on_release(self, key):
+        self.current_keys.discard(key)
+
+        if key == self.activation_key:
+            self.activation_key_pressed = False
+
     def run(self):
-        current_keys = set()
+        # start the keyboard listener
+        keyboard_listener = keyboard.Listener(on_press=self.on_press, on_release=self.on_release)
+        keyboard_listener.start()
 
-        with keyboard.Listener(on_press=lambda key: current_keys.add(key), on_release=lambda key: current_keys.discard(key)) as listener:
-
-            # F16 key
-            activation_key = 269025095
-            activation_key_pressed = False
-
-            frames = []
-
-            try:
-                while True:
-
-                    if keyboard.KeyCode.from_vk(activation_key) in current_keys:
-                        if not activation_key_pressed:
-                            print()
-                            # print listening in cyan
-                            print("\033[96m{}\033[00m".format("listening..."))
-                            self.stream.start_stream()
-                            activation_key_pressed = True
-                        frames_to_read = self.stream.get_read_available()
-                        if frames_to_read > 0:
-                            data = self.stream.read(frames_to_read, exception_on_overflow=False)
-                            frames.append(data)
-                    elif activation_key_pressed:
-                        # process the frames after the activation key is released
-                        self.stream.stop_stream()
-                        self.infer(frames)
-                        frames = []
-                        activation_key_pressed = False
-
-            except KeyboardInterrupt:
-                # handle the Ctrl+C interrupt
-                print("Exiting...")
+        # wait for the keyboard listener to finish
+        keyboard_listener.join()
 
 
 if __name__ == '__main__':
-    SpeachToText().run()
+    try:
+        SpeachToText().run()
+    except KeyboardInterrupt:
+        print("Exiting...")
