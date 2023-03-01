@@ -25,10 +25,6 @@ class SpeachToText:
         # open the audio stream
         self.chunk_size = 512
 
-        print()
-        # print ready in green
-        print("\033[92m{}\033[00m".format("ready!"))
-
         self.stream = self.p.open(format=pyaudio.paInt16,
                                   channels=1,
                                   rate=16000,
@@ -40,6 +36,10 @@ class SpeachToText:
         self.model = whisper.load_model(model_name)
 
         self.keyboard = keyboard.Controller()
+
+        print()
+        # print ready in green
+        print("\033[92m{}\033[00m".format("ready!"))
 
     # make destructor to close the stream and terminate the pyaudio instance
     def __del__(self):
