@@ -129,31 +129,6 @@ def graph_frames_from_pyaudio(frames):
     plt.show()
 
 
-def get_devices():
-    p = pyaudio.PyAudio()
-
-    # list the devices
-    print()
-    for i in range(p.get_device_count()):
-        print()
-        pprint.pprint(p.get_device_info_by_index(i))
-
-
-def pickle_frames(frames):
-    data = b''.join(frames)
-    data = np.frombuffer(data, dtype=np.int16)
-    with open('frames.pickle', 'wb') as f:
-        pickle.dump(data, f)
-
-
-def unpickle_frames():
-    print("Loading frames from pickle...")
-    with open('frames.pickle', 'rb') as f:
-        data = pickle.load(f)
-    print("done loading")
-    return data
-
-
 if __name__ == '__main__':
     speech_to_text = SpeachToText('default')
     speech_to_text.run()
