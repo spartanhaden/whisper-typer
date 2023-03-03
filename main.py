@@ -106,8 +106,11 @@ class SpeachToText:
         # reset the frames
         self.frames = []
 
-        # check if the output text is empty
-        if output_text == '':
+        # strip leading whitespace
+        output_text = output_text.lstrip()
+
+        # check if the output text is empty or is just periods
+        if output_text == '' or output_text == '.' * len(output_text):
             print('nothing detected')
             self.activation_key_pressed = False
             return
