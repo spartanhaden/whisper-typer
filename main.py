@@ -115,9 +115,6 @@ class SpeachToText:
             self.activation_key_pressed = False
             return
 
-        # remove the leading space
-        output_text = output_text[1:]
-
         # remove the trailing period if there is one
         output_text = output_text[:-1] if output_text[-1] == '.' else output_text
 
