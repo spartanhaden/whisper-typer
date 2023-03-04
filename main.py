@@ -39,6 +39,9 @@ class SpeachToText:
         # setup whisper
         self.model = whisper.load_model(model_name)
 
+        # make first inference on real data faster by forcing the model to finish loading
+        self.model.transcribe(np.zeros(201, dtype=np.float32))
+
         # setup pynput
         self.keyboard = keyboard.Controller()
 
