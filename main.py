@@ -78,6 +78,10 @@ class SpeachToText:
 
         data_to_transcribe = data.copy().flatten().astype(np.float32) / 32768.0
 
+        # make sure the data is long enough or that anything exists at all
+        if len(data_to_transcribe) <= 200:
+            return ''
+
         whisper_output = self.model.transcribe(data_to_transcribe)
 
         # return just the text
