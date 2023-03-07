@@ -118,8 +118,13 @@ class SpeachToText:
             self.activation_key_pressed = False
             return
 
-        # remove the trailing period if there is one
-        output_text = output_text[:-1] if output_text[-1] == '.' else output_text
+        # remove all the trailing periods but also handle the case where there is only periods
+        while output_text[-1] == '.':
+            output_text = output_text[:-1]
+            if output_text == '':
+                print('nothing detected')
+                self.activation_key_pressed = False
+                return
 
         # convert the text to lowercase
         output_text = output_text.lower()
