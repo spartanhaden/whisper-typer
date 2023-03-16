@@ -15,7 +15,6 @@ class SpeachToText:
         args = self.process_args()
 
         self.p = pyaudio.PyAudio()
-        self.stream = None
 
         # find the index of the specified device
         device_index = None
@@ -77,15 +76,15 @@ class SpeachToText:
     # make destructor to close the stream and terminate the pyaudio instance
     def __del__(self):
         # check if the thread is still running
-        if self.listener_thread is not None and self.listener_thread.is_alive():
+        if hasattr(self, 'listener_thread') and self.listener_thread is not None and self.listener_thread.is_alive():
             print('thread still running')
             print(f'thread: {self.listener_thread}')
 
         # if there is a stream open close it
-        if self.stream is not None:
+        if hasattr(self, 'stream') and self.stream is not None:
             self.stream.stop_stream()
             self.stream.close()
-        if self.p is not None:
+        if hasattr(self, 'p') and self.p is not None:
             self.p.terminate()
 
     # this function processes the arguments and returns them
