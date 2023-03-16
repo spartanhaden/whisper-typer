@@ -228,6 +228,6 @@ class SpeachToText:
 
 if __name__ == '__main__':
     try:
-        SpeachToText(model_name=args.model_name, mic_device=args.mic_device, inference_device=args.inference_device, activation_key=activation_key).run()
+        SpeachToText().run()
     except KeyboardInterrupt:
         print('Exiting...')
