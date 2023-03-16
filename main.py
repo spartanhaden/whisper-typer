@@ -12,7 +12,7 @@ from pynput import keyboard
 
 class SpeachToText:
     def __init__(self) -> None:
-        args = self.process_args()
+        self.args = self.process_args()
 
         self.p = pyaudio.PyAudio()
 
@@ -20,13 +20,13 @@ class SpeachToText:
         device_index = None
         for i in range(self.p.get_device_count()):
             info = self.p.get_device_info_by_index(i)
-            if info['name'] == args.mic_device:
+            if info['name'] == self.args.mic_device:
                 device_index = info['index']
                 break
 
         if device_index is None:
             self.p.terminate()
-            raise ValueError(f'Could not find audio device named {args.mic_device}')
+            raise ValueError(f'Could not find audio device named {self.args.mic_device}')
 
         # open the audio stream
         self.chunk_size = 512
@@ -50,7 +50,7 @@ class SpeachToText:
         start_time = time.time()
 
         # load the whisper model
-        self.model = whisper.load_model(name=args.model_name, device=args.inference_device)
+        self.model = whisper.load_model(name=self.args.model_name, device=self.args.inference_device)
 
         # make first inference on real data faster by forcing the model to finish loading since in_memory does not seem to fully preload the model
         self.model.transcribe(np.zeros(201, dtype=np.float32))
@@ -99,6 +99,8 @@ class SpeachToText:
         parser.add_argument('--inference_device', type=str, default=None,
                             help='the device to run the inference on. can be cpu, cuda, or cuda:<device number> will automatically select the best device if not specified')
         parser.add_argument('--activation_key', type=str, default='<ctrl_r>', help='the key to use for push to talk. can be like <ctrl_r> or <alt_l> or <f1> or e or 1 or 2 or 3 etc')
+        parser.add_argument('--keep_leading_whitespace', action='store_true', help='keep the leading space that whisper outputs')
+        parser.add_argument('--zoomer_mode', action='store_true', help='makes everything lowercase and removes all trailing periods')
         args = parser.parse_args()
 
         # print the model
@@ -137,6 +139,31 @@ class SpeachToText:
         # return just the text
         return whisper_output['text']
 
+    # removes leading white space and trailing periods and makes everything lowercase
+    def sanitize_output(self, output_text):
+        # strip leading whitespace
+        output_text = output_text.lstrip()
+
+        # check if the output text is empty or is just periods
+        if output_text == '' or output_text == '.' * len(output_text):
+            return ''
+
+        # remove all the trailing periods and make everything lowercase
+        if self.args.zoomer_mode:
+            while output_text[-1] == '.':
+                output_text = output_text[:-1]
+                if output_text == '':
+                    return ''
+
+            # convert the text to lowercase
+            output_text = output_text.lower()
+
+        # readd the leading whitespace if the user wants it
+        if self.args.keep_leading_whitespace:
+            output_text = ' ' + output_text
+
+        return output_text
+
     # listens to the audio stream and then processes the frames and types the output text
     def listen(self):
         self.activation_key_pressed = True
@@ -163,32 +190,17 @@ class SpeachToText:
         # reset the frames
         self.frames = []
 
-        # strip leading whitespace
-        output_text = output_text.lstrip()
+        output_text = self.sanitize_output(output_text)
 
-        # check if the output text is empty or is just periods
-        if output_text == '' or output_text == '.' * len(output_text):
+        if output_text == '':
             print('nothing detected')
-            self.activation_key_pressed = False
-            return
+        else:
+            print(output_text)
 
-        # remove all the trailing periods but also handle the case where there is only periods
-        while output_text[-1] == '.':
-            output_text = output_text[:-1]
-            if output_text == '':
-                print('nothing detected')
-                self.activation_key_pressed = False
-                return
-
-        # convert the text to lowercase
-        output_text = output_text.lower()
-
-        print(output_text)
-
-        # type the output text
-        self.currently_typing = True
-        self.keyboard.type(output_text)
-        self.currently_typing = False
+            # type the output text
+            self.currently_typing = True
+            self.keyboard.type(output_text)
+            self.currently_typing = False
 
         # reset the activation key
         self.activation_key_pressed = False
