@@ -12,6 +12,11 @@ Install requirements:
 pip3 install -r requirements.txt
 ```
 
+If you get "fatal error: 'portaudio.h' file not found". Make sure you have Homebrew installed (https://brew.sh/) and then run:
+```bash
+brew install portaudio
+```
+
 Run the script:
 
 ```bash
