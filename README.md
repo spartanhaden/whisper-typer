@@ -6,19 +6,27 @@ I have only tested this on Linux, but it should work on Windows and Mac as well
 
 ## Usage
 
-Install requirements:
+### Install requirements:
+
+Prerequisites for macOS users to use [PyAudio](https://people.csail.mit.edu/hubert/pyaudio)
+
+```bash
+brew install portaudio
+```
+
+Install python requirements:
 
 ```bash
 pip3 install -r requirements.txt
 ```
 
-Run the script:
+### Run the script:
 
 ```bash
 python3 main.py
 ```
 
-## Command line options
+### Command line options
 
 ```bash
 python3 main.py --help
