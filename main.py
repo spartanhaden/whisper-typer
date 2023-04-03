@@ -194,7 +194,8 @@ class SpeachToText:
         output_text = self.sanitize_output(output_text)
 
         if output_text == '':
-            print('nothing detected')
+            # print 'nothing detected' in orange
+            print('\033[93m{}\033[00m'.format('nothing detected'))
         else:
             print(output_text)
 
