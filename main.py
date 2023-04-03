@@ -39,7 +39,8 @@ class SpeachToText:
                                   rate=16000,
                                   input_device_index=device_index,
                                   input=True,
-                                  frames_per_buffer=self.chunk_size)
+                                  frames_per_buffer=self.chunk_size,
+                                  start=False)
 
         # overwrite the last print statement with mic ready in green
         print('\r\x1b[K\033[92m{}\033[00m'.format('mic ready!'))
