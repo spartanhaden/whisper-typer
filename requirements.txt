@@ -1,4 +1,4 @@
 numpy
 pyaudio
-whisper
+openai-whisper
 pynput
