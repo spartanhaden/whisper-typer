@@ -95,7 +95,7 @@ class SpeachToText:
         # add general description
         parser.description = 'a small script that types what you say using whisper while holding a hotkey'
         parser.add_argument('--model_name', type=str, default='base.en', choices=['tiny.en', 'tiny', 'base.en', 'base', 'small.en',
-                            'small', 'medium.en', 'medium', 'large-v1', 'large-v2', 'large'], help='the name of the whisper model to use')
+                            'small', 'medium.en', 'medium', 'large-v1', 'large-v2', 'large-v3', 'large'], help='the name of the whisper model to use')
         parser.add_argument('--mic_device', type=str, default='default', help='the name of the pyaudio input device to use')
         parser.add_argument('--inference_device', type=str, default=None,
                             help='the device to run the inference on. can be cpu, cuda, or cuda:<device number> will automatically select the best device if not specified')

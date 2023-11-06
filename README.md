@@ -39,7 +39,7 @@ a small script that types what you say using whisper while holding a hotkey
 
 options:
   -h, --help            show this help message and exit
-  --model_name {tiny.en,tiny,base.en,base,small.en,small,medium.en,medium,large-v1,large-v2,large}
+  --model_name {tiny.en,tiny,base.en,base,small.en,small,medium.en,medium,large-v1,large-v2,large-v3,large}
                         the name of the whisper model to use
   --mic_device MIC_DEVICE
                         the name of the pyaudio input device to use
