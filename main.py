@@ -10,7 +10,7 @@ import whisper
 from pynput import keyboard
 
 
-class SpeachToText:
+class SpeechToText:
     def __init__(self) -> None:
         self.args = self.process_args()
 
@@ -241,6 +241,6 @@ class SpeachToText:
 
 if __name__ == '__main__':
     try:
-        SpeachToText().run()
+        SpeechToText().run()
     except KeyboardInterrupt:
         print('Exiting...')
